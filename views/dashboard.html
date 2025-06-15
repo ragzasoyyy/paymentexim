@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - RagzPay</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/public/css/styles.css" />
+  <style>
+    body {
+      background-color: #0f172a;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      padding: 2rem;
+    }
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1f2937;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #334155;
+    }
+    th {
+      background-color: #111827;
+    }
+    tr:hover {
+      background-color: #1e293b;
+    }
+    .logout-btn {
+      background-color: #ef4444;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      float: right;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="logout-btn" onclick="logout()">Logout</button>
+  <h1>Dashboard Transaksi QRIS</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Invoice</th>
+        <th>Jumlah</th>
+        <th>Status</th>
+        <th>Tanggal</th>
+      </tr>
+    </thead>
+    <tbody id="transaksiBody">
+      <tr><td colspan="4">Memuat data...</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    const apikey = localStorage.getItem("api_key");
+
+    async function fetchData() {
+      try {
+        const res = await fetch("/api/status-check", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": apikey,
+          },
+          body: JSON.stringify({}),
+        });
+
+        const data = await res.json();
+        const tbody = document.getElementById("transaksiBody");
+        tbody.innerHTML = "";
+
+        if (!data || !Array.isArray(data.results)) {
+          tbody.innerHTML = "<tr><td colspan='4'>Tidak ada data ditemukan.</td></tr>";
+          return;
+        }
+
+        data.results.forEach(tx => {
+          const row = `
+            <tr>
+              <td>${tx.invoice_id}</td>
+              <td>Rp ${parseInt(tx.amount).toLocaleString()}</td>
+              <td style="color:${tx.status === 'PAID' ? '#4ade80' : '#facc15'}">${tx.status}</td>
+              <td>${new Date(tx.created_at).toLocaleString()}</td>
+            </tr>
+          `;
+          tbody.innerHTML += row;
+        });
+
+      } catch (err) {
+        document.getElementById("transaksiBody").innerHTML = "<tr><td colspan='4'>Gagal memuat data.</td></tr>";
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("api_key");
+      localStorage.removeItem("user_email");
+      window.location.href = "/views/login.html";
+    }
+
+    fetchData();
+  </script>
+
+</body>
+</html>

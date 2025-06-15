@@ -1,0 +1,78 @@
+<!-- /views/success.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Berhasil Dibayar - RagzPay</title>
+  <link rel="stylesheet" href="/public/css/styles.css" />
+  <style>
+    body {
+      background: #f0fff0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .success-card {
+      background: white;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 450px;
+      width: 100%;
+    }
+
+    .success-card h1 {
+      color: green;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .order-details {
+      margin-top: 15px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .success-icon {
+      font-size: 60px;
+      color: green;
+      margin-bottom: 15px;
+    }
+
+    a.btn {
+      display: inline-block;
+      margin-top: 20px;
+      background: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h1>Pembayaran Berhasil</h1>
+    <div class="order-details">
+      <p><strong>Order ID:</strong> <span id="oid">-</span></p>
+      <p><strong>Jumlah:</strong> <span id="amount">Rp 0</span></p>
+    </div>
+    <a href="/views/dashboard.html" class="btn">Kembali ke Dashboard</a>
+  </div>
+
+  <script>
+    const url = new URLSearchParams(window.location.search);
+    const orderId = url.get("order_id") || "-";
+    const amount = url.get("amount") || "0";
+
+    document.getElementById("oid").textContent = orderId;
+    document.getElementById("amount").textContent = "Rp " + parseInt(amount).toLocaleString("id-ID");
+  </script>
+</body>
+</html>

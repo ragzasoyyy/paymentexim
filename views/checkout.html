@@ -1,0 +1,134 @@
+<!-- /views/checkout.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QRIS Checkout | RagzPay</title>
+  <link rel="stylesheet" href="/public/css/styles.css" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f7f9fc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .checkout-card {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .checkout-card h2 {
+      margin-bottom: 10px;
+      font-size: 22px;
+      color: #333;
+    }
+
+    .qris-image img {
+      width: 220px;
+      height: auto;
+      margin: 20px auto;
+      border-radius: 12px;
+    }
+
+    .order-info {
+      margin: 10px 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .amount {
+      font-size: 20px;
+      font-weight: bold;
+      color: #000;
+    }
+
+    .countdown {
+      font-size: 14px;
+      color: red;
+      margin-top: 15px;
+    }
+
+    .status-button {
+      margin-top: 20px;
+      background: #007bff;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    #statusMessage {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="checkout-card">
+    <h2>Silakan Scan QRIS</h2>
+    <div class="order-info order-id">Order ID: <strong>ORD-XXXXXX</strong></div>
+    <div class="amount">Rp 0</div>
+    <div class="qris-image"><img src="" alt="QRIS" /></div>
+    <div class="countdown">Waktu Tersisa: <span id="countdown">05:00</span></div>
+    <button class="status-button" onclick="checkStatus()">Cek Status Pembayaran</button>
+    <div id="statusMessage"></div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get("order_id") || "ORDER-TEST";
+    const amount = params.get("amount") || "0";
+    const qrisUrl = params.get("qris_url") || "/public/assets/sample-qris.png";
+
+    document.querySelector(".order-id strong").textContent = orderId;
+    document.querySelector(".amount").textContent = "Rp " + parseInt(amount).toLocaleString("id-ID");
+    document.querySelector(".qris-image img").src = decodeURIComponent(qrisUrl);
+
+    // Countdown 5 menit
+    let timeLeft = 300;
+    const countdownEl = document.getElementById("countdown");
+    const interval = setInterval(() => {
+      const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      const seconds = String(timeLeft % 60).padStart(2, '0');
+      countdownEl.textContent = `${minutes}:${seconds}`;
+      timeLeft--;
+      if (timeLeft < 0) {
+        clearInterval(interval);
+        document.getElementById("statusMessage").innerHTML = "<b style='color:red'>❌ Waktu habis. Pembayaran gagal.</b>";
+      }
+    }, 1000);
+
+    function checkStatus() {
+      fetch('/api/status-check', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': 'RAZGZ_SUPERKEY_001'
+        },
+        body: JSON.stringify({ order_id: orderId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'paid') {
+          document.getElementById('statusMessage').innerHTML = "✅ <b>Pembayaran berhasil!</b>";
+          setTimeout(() => {
+            window.location.href = `/views/success.html?order_id=${orderId}&amount=${amount}`;
+          }, 1000);
+        } else {
+          document.getElementById('statusMessage').innerHTML = "⏳ Menunggu pembayaran...";
+        }
+      });
+    }
+  </script>
+</body>
+</html>
