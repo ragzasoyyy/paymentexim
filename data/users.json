@@ -1,0 +1,12 @@
+[
+  {
+    "username": "admin",
+    "password": "ragz123",
+    "apiKey": "RAZGZ_SUPERKEY_001"
+  },
+  {
+    "username": "partner",
+    "password": "partner123",
+    "apiKey": "RAZGZ_PARTNERKEY_002"
+  }
+]
