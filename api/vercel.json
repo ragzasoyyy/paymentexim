@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/*.js", "use": "@vercel/node" },
+    { "src": "auth/*.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/createpayment", "dest": "api/createpayment.js" },
+    { "src": "/api/status", "dest": "api/status-check.js" },
+    { "src": "/api/webhook", "dest": "api/webhook.js" },
+    
+    { "src": "/auth/login", "dest": "auth/login.js" },
+    { "src": "/auth/middleware", "dest": "auth/middleware.js" },
+
+    { "src": "/(.*)", "dest": "/views/$1" }
+  ]
+}
